@@ -5,9 +5,9 @@ from django.db.models import Count, Max, Min, Prefetch, Q
 from django.db.models.query import QuerySet
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
-from rest_framework import permissions, viewsets  # noqa: F401
+from rest_framework import viewsets
 from rest_framework.decorators import api_view
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -81,19 +81,26 @@ class ErgastModelViewSet(viewsets.ReadOnlyModelViewSet):
                 ),
                 final=Max("rounds__number"),
             )
+
+            round_num = None
             if race_round == "next" and round_info["next"] is not None:
                 # Next Round of ongoing championship to take place
-                race_round = str(round_info["next"])
+                round_num = round_info["next"]
             elif race_round == "next":
                 # First round of next season
-                race_round = str(1)
+                round_num = 1
                 season_year = str(int(season_year) + 1)
             elif race_round == "last" and round_info["next"] is not None:
                 # Last completed race of ongoing season
-                race_round = str(max(1, round_info["next"] - 1))
+                round_num = max(1, round_info["next"] - 1)
             elif race_round == "last":
                 # Final round of completed season
-                race_round = str(round_info["final"])
+                round_num = round_info["final"]
+
+            if round_num is None:
+                raise NotFound("Race round not found")
+
+            race_round = str(round_num)
             self.kwargs["race_round"] = race_round
             self.kwargs["season_year"] = season_year
         return season_year, race_round
