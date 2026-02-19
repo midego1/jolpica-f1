@@ -38,6 +38,12 @@ class SessionSerializer(BaseAPISerializer):
     # Must use CharField instead of DateTimeField as otherwise it will display as UTC
     local_timestamp = serializers.CharField(read_only=True)
     timezone = serializers.CharField(read_only=True)
+    missing_time_data = serializers.SerializerMethodField(read_only=True)
+
+    def get_missing_time_data(self, obj):
+        if obj.has_time_data:
+            return None
+        return True
 
     class Meta:
         model = f1.Session

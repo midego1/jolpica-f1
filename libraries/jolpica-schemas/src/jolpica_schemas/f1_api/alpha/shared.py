@@ -40,7 +40,7 @@ class BasicSession(BaseModel):
 
 class Session(BasicSession):
     timestamp: datetime.datetime | None = None
-    has_time_data: bool = False
+    missing_time_data: bool | None = Field(None, description="Does the timestamp field only have date information")
     local_timestamp: str | None = None
     timezone: str | None = None
     scheduled_laps: int | None = None

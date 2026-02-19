@@ -18,9 +18,14 @@ class SessionSerializer(OmitNullMixin, serializers.Serializer):
     type_display = serializers.CharField(source="get_type_display", read_only=True)
     timestamp = serializers.DateTimeField(read_only=True)
     timezone = serializers.CharField(read_only=True)
-    has_time_data = serializers.BooleanField(read_only=True)
+    missing_time_data = serializers.SerializerMethodField(read_only=True)
     # Must use CharField instead of DateTimeField as otherwise it will display as UTC
     local_timestamp = serializers.CharField(read_only=True)
+
+    def get_missing_time_data(self, obj):
+        if obj.has_time_data:
+            return None
+        return True
 
     def to_representation(self, instance):
         """

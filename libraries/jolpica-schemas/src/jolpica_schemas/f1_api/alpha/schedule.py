@@ -21,7 +21,7 @@ class ScheduleSession(BaseModel):
     type_display: str = Field(..., description="Display name for the session type")
     timestamp: datetime.datetime | None = None
     timezone: str | None = None
-    has_time_data: bool = False
+    missing_time_data: bool | None = Field(None, description="Does the timestamp field only have date information")
     local_timestamp: datetime.datetime | None = None
 
 
