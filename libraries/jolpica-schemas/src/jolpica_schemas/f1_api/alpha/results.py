@@ -34,6 +34,9 @@ class AvailableResultsItem(BaseModel):
 
 
 class AvailableResultsForRound(BaseModel):
+    year: int
+    round_number: int | None
+    round_name: str | None
     available_results: list[AvailableResultsItem]
 
 

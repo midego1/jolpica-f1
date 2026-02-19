@@ -57,7 +57,7 @@ class ResultsView(viewsets.ViewSet):
 
     def retrieve(self, req: request.Request, round_id: str | None = None) -> response.Response:
         """Return available result types for this round with URLs."""
-        round = f1.Round.objects.filter(api_id=round_id).prefetch_related("sessions").first()
+        round = f1.Round.objects.filter(api_id=round_id).select_related("season").prefetch_related("sessions").first()
         if round is None:
             return response.Response({"error": "Round not found"}, status=404)
 
@@ -74,6 +74,9 @@ class ResultsView(viewsets.ViewSet):
             AvailableResultsForRoundResponse(
                 metadata=DetailMetadata(timestamp=timezone.now()),
                 data=AvailableResultsForRound(
+                    year=round.season.year,
+                    round_name=round.name,
+                    round_number=round.number,
                     available_results=available_results,
                 ),
             ).model_dump(exclude_none=True, mode="json")
